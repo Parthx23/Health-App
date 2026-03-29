@@ -28,7 +28,7 @@ export function BenchmarkInsightCard({ comparison, className = '' }: BenchmarkIn
   const Icon = icons[comp]
 
   return (
-    <div className={`p-3 rounded-lg bg-card border border-border ${className}`}>
+    <div className={`p-3 rounded-2xl bg-card/70 backdrop-blur-md border border-border/50 shadow-sm ${className}`}>
       <div className="flex items-center gap-3">
         <div
           className={`w-8 h-8 rounded-full flex items-center justify-center ${colors[comp]}`}

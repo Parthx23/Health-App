@@ -3,7 +3,6 @@
 import { useMemo } from 'react'
 import { redirect } from 'next/navigation'
 import { AppShell } from '@/components/app-shell'
-import { LivingGarden } from '@/components/living-garden'
 import { AvatarMoodCard } from '@/components/avatar-mood-card'
 import { OrbitHabitInput } from '@/components/orbit-habit-input'
 import { WellnessScoreCard } from '@/components/wellness-score-card'
@@ -17,7 +16,7 @@ import {
   useTodayLog,
   incrementHabit,
 } from '@/lib/store'
-import { HABIT_KEYS, HABIT_CONFIGS } from '@/lib/habits'
+import { HABIT_KEYS } from '@/lib/habits'
 import {
   calculateWellnessScore,
   calculateGardenState,
@@ -89,19 +88,11 @@ export default function HomePage() {
 
   return (
     <AppShell>
-      <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
-        {/* Living Garden Header */}
-        <section aria-label="Living garden visualization">
-          <LivingGarden
-            gardenState={gardenState}
-            theme={preferences.gardenTheme}
-          />
-        </section>
-
+      <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
         {/* Greeting and Avatar */}
-        <section className="space-y-3">
-          <h1 className="text-xl font-semibold text-foreground">
-            {greeting}! <span className="text-muted-foreground font-normal">How are you today?</span>
+        <section className="space-y-3 pt-4">
+          <h1 className="text-xl font-semibold text-foreground drop-shadow-sm">
+            {greeting}! <span className="text-foreground/70 font-normal">How are you today?</span>
           </h1>
           <AvatarMoodCard
             config={preferences.avatarConfig}
@@ -111,7 +102,10 @@ export default function HomePage() {
         </section>
 
         {/* Orbit Habit Logging */}
-        <section aria-label="Log your habits">
+        <section 
+          aria-label="Log your habits"
+          className="bg-card/70 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-border/50"
+        >
           <h2 className="text-sm font-medium text-muted-foreground mb-4">
             Tap or drag to log today&apos;s progress
           </h2>

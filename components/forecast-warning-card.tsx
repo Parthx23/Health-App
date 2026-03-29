@@ -14,22 +14,22 @@ export function ForecastWarningCard({ forecast, className = '' }: ForecastWarnin
   const config = {
     low: {
       icon: CheckCircle,
-      bgColor: 'bg-success/10',
-      borderColor: 'border-success/30',
+      bgColor: 'bg-success/15 backdrop-blur-md',
+      borderColor: 'border-success/40',
       iconColor: 'text-success',
       textColor: 'text-success',
     },
     moderate: {
       icon: AlertCircle,
-      bgColor: 'bg-warning/10',
-      borderColor: 'border-warning/30',
+      bgColor: 'bg-warning/15 backdrop-blur-md',
+      borderColor: 'border-warning/40',
       iconColor: 'text-warning',
       textColor: 'text-warning',
     },
     high: {
       icon: AlertTriangle,
-      bgColor: 'bg-destructive/10',
-      borderColor: 'border-destructive/30',
+      bgColor: 'bg-destructive/15 backdrop-blur-md',
+      borderColor: 'border-destructive/40',
       iconColor: 'text-destructive',
       textColor: 'text-destructive',
     },
@@ -39,7 +39,7 @@ export function ForecastWarningCard({ forecast, className = '' }: ForecastWarnin
 
   return (
     <div
-      className={`p-4 rounded-xl ${config.bgColor} border ${config.borderColor} ${className}`}
+      className={`p-4 rounded-2xl shadow-sm ${config.bgColor} border ${config.borderColor} ${className}`}
     >
       <div className="flex items-start gap-3">
         <div className={`shrink-0 p-2 rounded-lg ${config.bgColor}`}>

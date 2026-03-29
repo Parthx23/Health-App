@@ -111,9 +111,9 @@ export default function MonthlyPage() {
     <AppShell>
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
         {/* Header */}
-        <header>
-          <h1 className="text-2xl font-bold text-foreground">Monthly View</h1>
-          <p className="text-sm text-muted-foreground">
+        <header className="pt-4">
+          <h1 className="text-2xl font-bold text-foreground drop-shadow-sm">Monthly View</h1>
+          <p className="text-sm text-foreground/70">
             Your wellness history for this month
           </p>
         </header>

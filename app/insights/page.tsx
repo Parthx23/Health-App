@@ -132,9 +132,9 @@ export default function InsightsPage() {
     <AppShell>
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
         {/* Header */}
-        <header>
-          <h1 className="text-2xl font-bold text-foreground">Insights</h1>
-          <p className="text-sm text-muted-foreground">
+        <header className="pt-4">
+          <h1 className="text-2xl font-bold text-foreground drop-shadow-sm">Insights</h1>
+          <p className="text-sm text-foreground/70">
             Your wellness trends and patterns
           </p>
         </header>
