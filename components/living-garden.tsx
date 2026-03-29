@@ -36,14 +36,17 @@ export function LivingGarden({ gardenState, theme, className = '', isBackground 
     return themes[theme]
   }, [theme, skyClarity])
 
-  // Generate flowers based on bloom level
+  // Generate flowers based on bloom level - positioned on the ground
   const flowers = useMemo(() => {
     const count = Math.floor(flowersBloom / 8)
+    // Pre-defined heights to avoid hydration mismatch
+    const heights = [12, 14, 10, 13, 11, 15, 12, 14, 10, 13, 11, 15]
     return Array.from({ length: count }, (_, i) => ({
       id: i,
-      x: 5 + (i * 31) % 90,
-      y: 70 + Math.sin(i * 2.5) * 6,
-      scale: 0.6 + (flowersBloom / 100) * 0.6,
+      x: 8 + (i * 27) % 84,
+      groundY: 84, // Where the stem meets the ground
+      stemHeight: heights[i % heights.length],
+      scale: 0.6 + (flowersBloom / 100) * 0.5,
       delay: i * 0.08,
       hue: [350, 45, 145, 280, 200, 30][i % 6],
     }))
@@ -210,49 +213,50 @@ export function LivingGarden({ gardenState, theme, className = '', isBackground 
           ))}
         </g>
 
-        {/* Flowers */}
+        {/* Flowers - rooted on the ground */}
         <g filter={fogLevel > 30 ? 'url(#fog)' : undefined}>
           {flowers.map((flower) => (
             <g
               key={flower.id}
-              transform={`translate(${flower.x}, ${flower.y}) scale(${flower.scale})`}
-              className="origin-center"
               style={{
                 animation: `bloom 0.6s ease-out ${flower.delay}s both`,
               }}
             >
-              {/* Stem */}
+              {/* Stem - from ground up */}
               <line
-                x1="0"
-                y1="0"
-                x2="0"
-                y2="10"
+                x1={flower.x}
+                y1={flower.groundY}
+                x2={flower.x}
+                y2={flower.groundY - flower.stemHeight}
                 stroke="oklch(0.48 0.12 140)"
-                strokeWidth="0.5"
+                strokeWidth={0.6 * flower.scale}
               />
-              {/* Leaf */}
+              {/* Leaf on stem */}
               <ellipse
-                cx="-1.5"
-                cy="6"
-                rx="1.2"
-                ry="0.6"
+                cx={flower.x - 1.5 * flower.scale}
+                cy={flower.groundY - flower.stemHeight * 0.4}
+                rx={1.5 * flower.scale}
+                ry={0.7 * flower.scale}
                 fill="oklch(0.5 0.14 138)"
-                transform="rotate(-30 -1.5 6)"
+                transform={`rotate(-35 ${flower.x - 1.5 * flower.scale} ${flower.groundY - flower.stemHeight * 0.4})`}
               />
-              {/* Petals */}
-              {[0, 72, 144, 216, 288].map((angle) => (
-                <ellipse
-                  key={angle}
-                  cx={Math.cos((angle * Math.PI) / 180) * 2.2}
-                  cy={Math.sin((angle * Math.PI) / 180) * 2.2 - 1}
-                  rx="1.8"
-                  ry="2.5"
-                  fill={`oklch(0.72 0.2 ${flower.hue})`}
-                  transform={`rotate(${angle} 0 -1)`}
-                />
-              ))}
-              {/* Center */}
-              <circle cx="0" cy="-1" r="1.2" fill="oklch(0.88 0.16 85)" />
+              {/* Flower head at top of stem */}
+              <g transform={`translate(${flower.x}, ${flower.groundY - flower.stemHeight}) scale(${flower.scale})`}>
+                {/* Petals */}
+                {[0, 72, 144, 216, 288].map((angle) => (
+                  <ellipse
+                    key={angle}
+                    cx={Math.cos((angle * Math.PI) / 180) * 2}
+                    cy={Math.sin((angle * Math.PI) / 180) * 2}
+                    rx="1.6"
+                    ry="2.2"
+                    fill={`oklch(0.72 0.2 ${flower.hue})`}
+                    transform={`rotate(${angle} 0 0)`}
+                  />
+                ))}
+                {/* Center */}
+                <circle cx="0" cy="0" r="1.1" fill="oklch(0.88 0.16 85)" />
+              </g>
             </g>
           ))}
         </g>
