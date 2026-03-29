@@ -3,7 +3,6 @@
 import { useMemo } from 'react'
 import { redirect } from 'next/navigation'
 import { AppShell } from '@/components/app-shell'
-import { LivingGarden } from '@/components/living-garden'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
@@ -105,22 +104,15 @@ export default function AvatarPage() {
     <AppShell>
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
         {/* Header */}
-        <header>
-          <h1 className="text-2xl font-bold text-foreground">Your Garden</h1>
-          <p className="text-sm text-muted-foreground">
+        <header className="pt-4">
+          <h1 className="text-2xl font-bold text-foreground drop-shadow-sm">Your Garden</h1>
+          <p className="text-sm text-foreground/70">
             Watch your garden grow with your habits
           </p>
         </header>
 
-        {/* Large Garden View */}
+        {/* Garden State Explanation */}
         <section className="space-y-3">
-          <LivingGarden
-            gardenState={gardenState}
-            theme={gardenTheme}
-            className="h-56 md:h-72"
-          />
-          
-          {/* Garden State Explanation */}
           <Card>
             <CardContent className="pt-4">
               <div className="flex items-center justify-between mb-3">

@@ -61,7 +61,7 @@ export function MonthlyHeatmap({
   const daysLogged = dayScores.filter((d) => d.hasData).length
 
   return (
-    <div className={`p-4 rounded-xl bg-card border border-border ${className}`}>
+    <div className={`p-4 rounded-2xl bg-card/70 backdrop-blur-md border border-border/50 shadow-sm ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-foreground">{currentMonth}</h3>

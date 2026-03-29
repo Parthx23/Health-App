@@ -13,7 +13,7 @@ export function StreakCalendar({ streakData, className = '' }: StreakCalendarPro
   const { currentStreak, longestStreak, lastSevenDays } = streakData
 
   return (
-    <div className={`p-4 rounded-xl bg-card border border-border ${className}`}>
+    <div className={`p-4 rounded-2xl bg-card/70 backdrop-blur-md border border-border/50 shadow-sm ${className}`}>
       {/* Streak summary */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">

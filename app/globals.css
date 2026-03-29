@@ -186,10 +186,7 @@
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
 
-/* Smooth scroll for the app */
-html {
-  scroll-behavior: smooth;
-}
+
 
 /* Hide scrollbar but keep functionality */
 .scrollbar-hide {
