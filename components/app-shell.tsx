@@ -3,6 +3,7 @@
 import { ReactNode } from 'react'
 import { BottomNav } from './bottom-nav'
 import { LivingGarden } from './living-garden'
+import { VoiceButton } from './voice-button'
 import { usePreferences, useTodayLog, useTargets } from '@/lib/store'
 import { calculateGardenState } from '@/lib/scoring'
 
@@ -38,6 +39,13 @@ export function AppShell({ children, hideNav = false, showGardenBackground = tru
       </main>
       
       {showNav && <BottomNav />}
+
+      {/* Floating voice mic FAB — centred above bottom nav */}
+      {showNav && (
+        <div className="fixed bottom-[72px] left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
+          <VoiceButton />
+        </div>
+      )}
     </div>
   )
 }

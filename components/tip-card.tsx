@@ -13,7 +13,7 @@ export function TipCard({ tip, className = '' }: TipCardProps) {
   const config = HABIT_CONFIGS[tip.habit]
 
   return (
-    <div className={`p-4 rounded-2xl bg-accent/40 backdrop-blur-md border border-accent/50 shadow-sm ${className}`}>
+    <div className={`p-4 rounded-2xl bg-accent/20 border border-accent/50 shadow-sm ${className}`}>
       <div className="flex items-start gap-3">
         <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center shrink-0">
           <Lightbulb className="w-4 h-4 text-accent-foreground" />

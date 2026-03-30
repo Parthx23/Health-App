@@ -153,7 +153,7 @@ export default function OnboardingPage() {
                 <div className="space-y-2">
                   <Sparkles className="w-12 h-12 mx-auto text-primary" />
                   <h1 className="text-3xl font-bold text-foreground">
-                    Welcome to Arogya Garden
+                    Welcome to WellNest
                   </h1>
                   <p className="text-muted-foreground text-lg">
                     Your personal wellness companion

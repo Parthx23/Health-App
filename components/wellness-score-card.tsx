@@ -27,7 +27,7 @@ export function WellnessScoreCard({ scoreData, className = '' }: WellnessScoreCa
   }
 
   return (
-    <div className={`p-4 rounded-2xl bg-card/70 backdrop-blur-md border border-border/50 shadow-sm ${className}`}>
+    <div className={`p-4 rounded-2xl bg-card/20 border border-border/50 shadow-sm ${className}`}>
       {/* Main score */}
       <div className="flex items-center justify-between mb-4">
         <div>

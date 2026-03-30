@@ -90,7 +90,7 @@ export function LivingGarden({ gardenState, theme, className = '', isBackground 
   }, [])
 
   const containerClass = isBackground 
-    ? 'fixed inset-0 w-full h-full -z-10'
+    ? 'fixed inset-0 w-full h-full -z-10 overflow-hidden pointer-events-none'
     : `relative w-full h-48 md:h-64 overflow-hidden rounded-xl ${className}`
 
   return (
@@ -205,9 +205,9 @@ export function LivingGarden({ gardenState, theme, className = '', isBackground 
               stroke="oklch(0.52 0.16 135)"
               strokeWidth="0.6"
               fill="none"
-              className="origin-bottom"
               style={{
-                animation: `sway ${2.5 + blade.id * 0.08}s ease-in-out infinite alternate`,
+                transformOrigin: `${blade.x}px 85px`,
+                animation: `wn-sway ${2.5 + blade.id * 0.08}s ease-in-out infinite alternate`,
               }}
             />
           ))}
@@ -219,7 +219,10 @@ export function LivingGarden({ gardenState, theme, className = '', isBackground 
             <g
               key={flower.id}
               style={{
-                animation: `bloom 0.6s ease-out ${flower.delay}s both`,
+                transformOrigin: `${flower.x}px ${flower.groundY}px`,
+                /* bloom-in: scale from 0 → flower.scale */
+                transform: `scale(${flower.scale})`,
+                animation: `wn-bloom 0.6s ease-out ${flower.delay}s both`,
               }}
             >
               {/* Stem - from ground up */}
@@ -229,19 +232,19 @@ export function LivingGarden({ gardenState, theme, className = '', isBackground 
                 x2={flower.x}
                 y2={flower.groundY - flower.stemHeight}
                 stroke="oklch(0.48 0.12 140)"
-                strokeWidth={0.6 * flower.scale}
+                strokeWidth={0.6}
               />
               {/* Leaf on stem */}
               <ellipse
-                cx={flower.x - 1.5 * flower.scale}
+                cx={flower.x - 1.5}
                 cy={flower.groundY - flower.stemHeight * 0.4}
-                rx={1.5 * flower.scale}
-                ry={0.7 * flower.scale}
+                rx={1.5}
+                ry={0.7}
                 fill="oklch(0.5 0.14 138)"
-                transform={`rotate(-35 ${flower.x - 1.5 * flower.scale} ${flower.groundY - flower.stemHeight * 0.4})`}
+                transform={`rotate(-35 ${flower.x - 1.5} ${flower.groundY - flower.stemHeight * 0.4})`}
               />
               {/* Flower head at top of stem */}
-              <g transform={`translate(${flower.x}, ${flower.groundY - flower.stemHeight}) scale(${flower.scale})`}>
+              <g transform={`translate(${flower.x}, ${flower.groundY - flower.stemHeight})`}>
                 {/* Petals */}
                 {[0, 72, 144, 216, 288].map((angle) => (
                   <ellipse
@@ -278,53 +281,40 @@ export function LivingGarden({ gardenState, theme, className = '', isBackground 
           <g
             key={particle.id}
             style={{
-              animation: `float ${particle.duration}s ease-in-out ${particle.delay}s infinite`,
+              animation: `wn-float ${particle.duration}s ease-in-out ${particle.delay}s infinite`,
             }}
           >
             <path
-              d={`M ${particle.startX} ${particle.startY} 
-                  q -2 -1.2 -1.2 -3 q 0.6 -1.8 1.2 0.6 
-                  q 0.6 -2.4 1.2 -0.6 q 0.6 1.8 -1.2 3`}
+              d={`M ${particle.startX} ${particle.startY} q -2 -1.2 -1.2 -3 q 0.6 -1.8 1.2 0.6 q 0.6 -2.4 1.2 -0.6 q 0.6 1.8 -1.2 3`}
               fill={theme === 'moonlight' ? 'oklch(0.85 0.05 240)' : 'oklch(0.8 0.12 280)'}
               opacity="0.75"
-              className="origin-center"
             />
           </g>
         ))}
       </svg>
 
-      <style jsx>{`
-        @keyframes sway {
-          0% {
-            transform: rotate(-4deg);
-          }
-          100% {
-            transform: rotate(4deg);
-          }
+      {/* Dark overlay so garden doesn't overpower UI */}
+      {isBackground && (
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.22) 100%)' }}
+        />
+      )}
+
+      <style>{`
+        @keyframes wn-sway {
+          0%   { transform: rotate(-4deg); }
+          100% { transform: rotate(4deg); }
         }
-        @keyframes bloom {
-          0% {
-            transform: scale(0);
-            opacity: 0;
-          }
-          100% {
-            transform: scale(${flowersBloom / 100});
-            opacity: 1;
-          }
+        @keyframes wn-bloom {
+          0%   { transform: scale(0); opacity: 0; }
+          100% { transform: scale(1);  opacity: 1; }
         }
-        @keyframes float {
-          0%, 100% {
-            transform: translate(0, 0);
-          }
-          25% {
-            transform: translate(6px, -4px);
-          }
-          50% {
-            transform: translate(3px, -8px);
-          }
-          75% {
-            transform: translate(-4px, -3px);
-          }
+        @keyframes wn-float {
+          0%, 100% { transform: translate(0,    0); }
+          25%       { transform: translate(6px, -4px); }
+          50%       { transform: translate(3px, -8px); }
+          75%       { transform: translate(-4px,-3px); }
         }
       `}</style>
     </div>

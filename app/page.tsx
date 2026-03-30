@@ -104,7 +104,7 @@ export default function HomePage() {
         {/* Orbit Habit Logging */}
         <section 
           aria-label="Log your habits"
-          className="bg-card/70 backdrop-blur-md rounded-2xl p-4 shadow-sm border border-border/50"
+          className="bg-card/20 rounded-2xl p-4 shadow-sm border border-border/50"
         >
           <h2 className="text-sm font-medium text-muted-foreground mb-4">
             Tap or drag to log today&apos;s progress

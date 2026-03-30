@@ -49,7 +49,7 @@ export function AvatarMoodCard({ config, mood, score, className = '' }: AvatarMo
   const message = MOOD_MESSAGES[mood]
 
   return (
-    <div className={`flex items-center gap-4 p-4 rounded-2xl bg-card/70 backdrop-blur-md border border-border/50 shadow-sm ${className}`}>
+    <div className={`flex items-center gap-4 p-4 rounded-2xl bg-card/20 border border-border/50 shadow-sm ${className}`}>
       <div className="relative w-20 h-20 shrink-0">
         <svg viewBox="0 0 100 100" className="w-full h-full">
           {/* Body / Outfit */}

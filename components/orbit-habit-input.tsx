@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { Droplets, Moon, Activity, Apple, Eye, Heart, Minus, Plus } from 'lucide-react'
 import type { HabitKey } from '@/lib/types'
 import { HABIT_CONFIGS } from '@/lib/habits'
@@ -38,49 +38,99 @@ export function OrbitHabitInput({
   const [isDragging, setIsDragging] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const handleIncrement = useCallback(() => {
-    if (currentValue < config.maxValue) {
-      onValueChange(currentValue + 1)
-    }
-  }, [currentValue, config.maxValue, onValueChange])
+  // All mutable drag state in a single ref — never stale inside callbacks
+  const drag = useRef({
+    active: false,
+    lastAngle: 0,
+    accumulated: 0,  // float accumulator — single source of truth
+    lastEmitted: 0,  // last integer we sent to onValueChange
+    maxValue: config.maxValue,
+    target: targetValue,
+  })
 
-  const handleDecrement = useCallback(() => {
-    if (currentValue > 0) {
-      onValueChange(currentValue - 1)
-    }
-  }, [currentValue, onValueChange])
+  // Keep ref values in sync with props without recreating callbacks
+  useEffect(() => {
+    drag.current.maxValue = config.maxValue
+    drag.current.target = targetValue
+  }, [config.maxValue, targetValue])
 
-  // Handle drag/touch interactions for orbit-style input
+  // Stable onValueChange ref so callbacks never go stale
+  const onChangeRef = useRef(onValueChange)
+  useEffect(() => { onChangeRef.current = onValueChange }, [onValueChange])
+
+  // ── Pointer handlers ──────────────────────────────────────────────────
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     if (!containerRef.current) return
-    setIsDragging(true)
     e.currentTarget.setPointerCapture(e.pointerId)
-  }, [])
-
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (!isDragging || !containerRef.current) return
+    e.preventDefault()
 
     const rect = containerRef.current.getBoundingClientRect()
-    const centerX = rect.left + rect.width / 2
-    const centerY = rect.top + rect.height / 2
-    
-    // Calculate angle from center
-    const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX)
-    // Convert to 0-1 range (starting from top, going clockwise)
-    const normalizedAngle = ((angle + Math.PI / 2 + Math.PI * 2) % (Math.PI * 2)) / (Math.PI * 2)
-    
-    // Map to value range
-    const newValue = Math.round(normalizedAngle * config.maxValue)
-    if (newValue !== currentValue && newValue >= 0 && newValue <= config.maxValue) {
-      onValueChange(newValue)
-    }
-  }, [isDragging, config.maxValue, currentValue, onValueChange])
+    const cx = rect.left + rect.width / 2
+    const cy = rect.top + rect.height / 2
 
-  const handlePointerUp = useCallback(() => {
+    // Seed accumulated with the CURRENT display value (read from DOM attr or currentValue prop)
+    const seedValue = parseFloat(
+      containerRef.current.getAttribute('data-value') ?? '0'
+    )
+
+    drag.current.active = true
+    drag.current.lastAngle = Math.atan2(e.clientY - cy, e.clientX - cx)
+    drag.current.accumulated = seedValue
+    drag.current.lastEmitted = Math.round(seedValue)
+
+    setIsDragging(true)
+  }, []) // no deps — reads everything from refs
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!drag.current.active || !containerRef.current) return
+
+    const rect = containerRef.current.getBoundingClientRect()
+    const cx = rect.left + rect.width / 2
+    const cy = rect.top + rect.height / 2
+
+    const angle = Math.atan2(e.clientY - cy, e.clientX - cx)
+    let delta = angle - drag.current.lastAngle
+
+    // Unwrap across the ±π boundary
+    if (delta > Math.PI)  delta -= Math.PI * 2
+    if (delta < -Math.PI) delta += Math.PI * 2
+
+    // 1 full revolution = targetValue units (clamped ≥ 1 to avoid ÷0)
+    const deltaValue = (delta / (Math.PI * 2)) * Math.max(drag.current.target, 1)
+
+    drag.current.accumulated = Math.max(
+      0,
+      Math.min(drag.current.accumulated + deltaValue, drag.current.maxValue)
+    )
+    drag.current.lastAngle = angle
+
+    const next = Math.round(drag.current.accumulated)
+    if (next !== drag.current.lastEmitted) {
+      drag.current.lastEmitted = next
+      onChangeRef.current(next)
+    }
+  }, []) // no deps — all state from refs
+
+  const handlePointerUp = useCallback((e: React.PointerEvent) => {
+    drag.current.active = false
     setIsDragging(false)
+    e.currentTarget.releasePointerCapture(e.pointerId)
   }, [])
 
-  // Calculate stroke dasharray for progress ring
+  // ── Button helpers ────────────────────────────────────────────────────
+  const handleIncrement = useCallback(() => {
+    const cur = parseFloat(containerRef.current?.getAttribute('data-value') ?? '0')
+    const next = Math.min(Math.round(cur) + 1, config.maxValue)
+    onChangeRef.current(next)
+  }, [config.maxValue])
+
+  const handleDecrement = useCallback(() => {
+    const cur = parseFloat(containerRef.current?.getAttribute('data-value') ?? '0')
+    const next = Math.max(Math.round(cur) - 1, 0)
+    onChangeRef.current(next)
+  }, [])
+
+  // ── SVG ring ─────────────────────────────────────────────────────────
   const circumference = 2 * Math.PI * 36
   const strokeDasharray = `${completion * circumference} ${circumference}`
 
@@ -88,6 +138,7 @@ export function OrbitHabitInput({
     <div className={`flex flex-col items-center gap-2 ${className}`}>
       <div
         ref={containerRef}
+        data-value={currentValue}          /* live value readable by stable callbacks */
         className={`relative w-24 h-24 cursor-pointer touch-none select-none transition-transform ${
           isDragging ? 'scale-105' : ''
         }`}
@@ -102,19 +153,18 @@ export function OrbitHabitInput({
         aria-valuemax={config.maxValue}
         tabIndex={0}
         onKeyDown={(e) => {
+          const cur = currentValue
           if (e.key === 'ArrowUp' || e.key === 'ArrowRight') {
-            handleIncrement()
+            onChangeRef.current(Math.min(cur + 1, config.maxValue))
           } else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') {
-            handleDecrement()
+            onChangeRef.current(Math.max(cur - 1, 0))
           }
         }}
       >
         <svg viewBox="0 0 80 80" className="w-full h-full -rotate-90">
           {/* Background ring */}
           <circle
-            cx="40"
-            cy="40"
-            r="36"
+            cx="40" cy="40" r="36"
             fill="none"
             stroke="currentColor"
             strokeWidth="6"
@@ -122,15 +172,13 @@ export function OrbitHabitInput({
           />
           {/* Progress ring */}
           <circle
-            cx="40"
-            cy="40"
-            r="36"
+            cx="40" cy="40" r="36"
             fill="none"
             stroke={config.color}
             strokeWidth="6"
             strokeLinecap="round"
             strokeDasharray={strokeDasharray}
-            className="transition-all duration-200"
+            className={isDragging ? 'transition-none' : 'transition-all duration-200'}
           />
         </svg>
 
@@ -141,15 +189,11 @@ export function OrbitHabitInput({
           }`}
         >
           <Icon className="w-5 h-5 mb-1" />
-          <span className="text-lg font-bold leading-none">
-            {currentValue}
-          </span>
-          <span className="text-[10px] text-muted-foreground">
-            /{targetValue}
-          </span>
+          <span className="text-lg font-bold leading-none">{currentValue}</span>
+          <span className="text-[10px] text-muted-foreground">/{targetValue}</span>
         </div>
 
-        {/* Completion indicator */}
+        {/* Completion badge */}
         {isComplete && (
           <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-success text-success-foreground flex items-center justify-center">
             <svg viewBox="0 0 24 24" className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="3">
@@ -164,12 +208,10 @@ export function OrbitHabitInput({
         {config.label}
       </span>
 
-      {/* Quick increment/decrement buttons */}
+      {/* +/- buttons */}
       <div className="flex items-center gap-1">
         <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
+          variant="ghost" size="icon" className="h-7 w-7"
           onClick={handleDecrement}
           disabled={currentValue <= 0}
           aria-label={`Decrease ${config.label}`}
@@ -177,9 +219,7 @@ export function OrbitHabitInput({
           <Minus className="h-3 w-3" />
         </Button>
         <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
+          variant="ghost" size="icon" className="h-7 w-7"
           onClick={handleIncrement}
           disabled={currentValue >= config.maxValue}
           aria-label={`Increase ${config.label}`}

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Nunito, Geist_Mono } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import { Analytics } from '@vercel/analytics/next'
+import { Toaster } from '@/components/ui/toaster'
 import './globals.css'
 
 const nunito = Nunito({ 
@@ -15,25 +16,37 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Arogya Garden - Your Wellness Companion',
+  title: 'WellNest - Your Wellness Companion',
   description: 'A playful wellness app for Indian students and young adults. Track habits, grow your garden, and prevent burnout.',
   generator: 'v0.app',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    title: 'WellNest',
+    statusBarStyle: 'black-translucent',
+  },
+  formatDetection: {
+    telephone: false,
+  },
   icons: {
     icon: [
       {
-        url: '/icon-light-32x32.png',
+        url: '/0001-9118036015437569928.png',
+        type: 'image/png',
+      },
+      {
+        url: '/0001-9118036015437569928.png',
         media: '(prefers-color-scheme: light)',
+        type: 'image/png',
       },
       {
-        url: '/icon-dark-32x32.png',
+        url: '/0001-9118036015437569928.png',
         media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
+        type: 'image/png',
       },
     ],
-    apple: '/apple-icon.png',
+    apple: '/0001-9118036015437569928.png',
+    shortcut: '/0001-9118036015437569928.png',
   },
 }
 
@@ -63,6 +76,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <Toaster />
         </ThemeProvider>
         <Analytics />
       </body>

@@ -14,21 +14,21 @@ export function ForecastWarningCard({ forecast, className = '' }: ForecastWarnin
   const config = {
     low: {
       icon: CheckCircle,
-      bgColor: 'bg-success/15 backdrop-blur-md',
+      bgColor: 'bg-success/15',
       borderColor: 'border-success/40',
       iconColor: 'text-success',
       textColor: 'text-success',
     },
     moderate: {
       icon: AlertCircle,
-      bgColor: 'bg-warning/15 backdrop-blur-md',
+      bgColor: 'bg-warning/15',
       borderColor: 'border-warning/40',
       iconColor: 'text-warning',
       textColor: 'text-warning',
     },
     high: {
       icon: AlertTriangle,
-      bgColor: 'bg-destructive/15 backdrop-blur-md',
+      bgColor: 'bg-destructive/15',
       borderColor: 'border-destructive/40',
       iconColor: 'text-destructive',
       textColor: 'text-destructive',
